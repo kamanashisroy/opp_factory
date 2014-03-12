@@ -10,6 +10,7 @@ extern "C" {
 #endif
 
 #include "opp/opp_factory.h"
+#include "opp/opp_factory_profiler.h"
 #include "opp/opp_queue.h"
 #include "sync/types_internal.h"
 #include "sync/logger.h"
@@ -420,13 +421,9 @@ int opp_queue_do_full_unsafe(struct opp_queue*queue, int (*func)(void*data, void
         }
       }
       queue->_use_count--;
-#if 0
-      OPPUNREF(node);
-#else
       // two step destruction is done to avoid deadlock
       OPPUNREF(node->obj_data);
       OPPUNREF(node);
-#endif
       node = prev;
     }
   }
@@ -557,7 +554,7 @@ void opp_queuesystem_verb(void (*log)(void *log_data, const char*fmt, ...), void
 int opp_queuesystem_init() {
 	int i,res = 0;
 	for(i=0;!res && i<OPP_QUEUE_FACTORY_COUNT;i++) {
-		res = opp_factory_create_full(queue_factorys+i, OPP_QUEUE_BUFFER_INC
+		res = OPP_PFACTORY_CREATE_FULL(queue_factorys+i, OPP_QUEUE_BUFFER_INC
 			, sizeof(struct opp_queue_item)
 			, 1/*token offset*/, OPPF_HAS_LOCK | OPPF_SWEEP_ON_UNREF | OPPF_FAST_INITIALIZE
 			, OPP_CB_FUNC(opp_queue_item));
@@ -568,7 +565,7 @@ int opp_queuesystem_init() {
 void opp_queuesystem_deinit() {
 	int i;
 	for(i=0;i<OPP_QUEUE_FACTORY_COUNT;i++) {
-		opp_factory_destroy(queue_factorys+i);
+		OPP_PFACTORY_DESTROY(queue_factorys+i);
 	}
 }
 

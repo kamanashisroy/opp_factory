@@ -140,6 +140,8 @@ int opp_test_flag(const void*data, unsigned int flag);
 #endif
 #define OPPREF(x) ({opp_ref(x, __FILE__, __LINE__);})
 void*opp_ref(void*data, const char*filename, int lineno);
+#define OPP_ASSERT_REF_COUNT(x,rc) ({opp_assert_ref_count(x, rc, __FILE__, __LINE__);})
+int opp_assert_ref_count(void*data, int refcount, const char*filename, int lineno);
 #define OPPUNREF2(x) ({opp_unref((void**)(x), __FILE__, __LINE__);})
 #define OPPUNREF(x) opp_unref((void**)&(x), __FILE__, __LINE__)
 void opp_unref(void**data, const char*filename, int lineno);
@@ -168,6 +170,12 @@ int opp_dump(const void*data, void (*log)(void *log_data, const char*fmt, ...), 
 #endif
 
 #define EXTOBJ_TEST_FLAG(o,f) ((o)->_ext.flag & f)
+
+#define OPP_FACTORY_DUMP_HEADER_FMT() "%-10.10s %-10.10s %-10.10s %-10.10s %-10.10s %-10.10s %-10.10s"
+#define OPP_FACTORY_DUMP_HEADER_ARG() "pools","allocated","used","objects","slots","bitstring size","pool size"
+#define OPP_FACTORY_DUMP_FMT() "%10d %10d %10d %10d %10d %10d %10d"
+#define OPP_FACTORY_DUMP_ARG(x) (x)->pool_count, (int)((x)->pool_count*(x)->memory_chunk_size), (int)((x)->slot_use_count*(x)->obj_size) \
+	, (x)->use_count , (x)->slot_use_count , (int)(x)->bitstring_size , (int)(x)->pool_size
 
 #ifdef __cplusplus
 }

@@ -55,8 +55,15 @@ unsigned long get_hash(const char *z){
   return  h;
 }
 
+
 unsigned long get_hash_bin(const void*data, int size) {
-	return 1;
+	/* This code implementation is copied from static int binHash(const void *pKey, int nKey) of hash.c file of sqlite project */
+	int h = 0;
+	const char *z = (const char *)data;
+	while( size-- > 0 ){
+	h = (h<<3) ^ h ^ *(z++);
+	}
+	return h & 0x7fffffff;
 }
 
 /*********************************************************************/
